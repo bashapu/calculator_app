@@ -59,6 +59,8 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     String operator = parts[1].trim();
     double operand2 = double.parse(parts[2].trim());
 
+    if (operand2 == 0) throw Exception('Cannot Divide by Zero');
+
     switch (operator) {
       case '+':
         return operand1 + operand2;
