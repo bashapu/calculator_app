@@ -33,7 +33,6 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
   });
 }
 
-
   void calculateResult() {
     try {
       final result = evaluateExpression(displayText);
@@ -42,7 +41,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
       });
     } catch (e) {
       setState(() {
-        displayText = 'Error';
+        displayText = e.toString() == 'Exception: Cannot Divide by Zero' ? 'Cannot Divide by Zero' : 'Error';
       });
     }
   }
@@ -53,13 +52,24 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     });
   }
 
+  void backspace() {
+    if (displayText.isNotEmpty) {
+      setState(() {
+        displayText = displayText.substring(0, displayText.length - 1);
+      });
+    }
+  }
+
   double evaluateExpression(String expression) {
-    List<String> parts = expression.split(RegExp(r'(\+|\-|\*|\/)'));
+    RegExp regExp = RegExp(r'(\d+(\.\d*)?|\+|\-|\*|\/)');
+    
+    Iterable<Match> matches = regExp.allMatches(expression);
+
+    List<String> parts = matches.map((match) => match.group(0)!).toList();
+
     double operand1 = double.parse(parts[0].trim());
     String operator = parts[1].trim();
     double operand2 = double.parse(parts[2].trim());
-
-    if (operand2 == 0) throw Exception('Cannot Divide by Zero');
 
     switch (operator) {
       case '+':
@@ -69,10 +79,10 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
       case '*':
         return operand1 * operand2;
       case '/':
-        if (operand2 == 0) throw Exception('Cannot divide by zero');
+        if (operand2 == 0) throw Exception('Cannot Divide by Zero');
         return operand1 / operand2;
       default:
-        throw Exception('Invalid operator');
+        throw Exception('Invalid Operator');
     }
   }
 
@@ -124,7 +134,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildButton('='),
+              _buildButton('='), _buildBackspaceButton(),
             ],
           ),
           SizedBox(height: 40,),
@@ -155,6 +165,28 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
           child: Text(
             label,
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper function for backspace button
+  Widget _buildBackspaceButton() {
+    return InkWell(
+      onTap: backspace,
+      child: Container(
+        width: 70,
+        height: 70,
+        decoration: BoxDecoration(
+          color: Colors.red[200],
+          borderRadius: BorderRadius.circular(35),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.backspace,
+            size: 32,
+            color: Colors.white,
           ),
         ),
       ),
