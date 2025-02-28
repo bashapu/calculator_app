@@ -24,6 +24,53 @@ class CalculatorHomePage extends StatefulWidget {
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String displayText = '';
 
+  // Function to update the display text
+  void updateDisplay(String value) {
+    setState(() {
+      displayText += value;
+    });
+  }
+
+  void calculateResult() {
+    try {
+      final result = evaluateExpression(displayText);
+      setState(() {
+        displayText = result.toString();
+      });
+    } catch (e) {
+      setState(() {
+        displayText = 'Error';
+      });
+    }
+  }
+
+  void clearDisplay() {
+    setState(() {
+      displayText = '';
+    });
+  }
+
+  double evaluateExpression(String expression) {
+    List<String> parts = expression.split(RegExp(r'(\+|\-|\*|\/)'));
+    double operand1 = double.parse(parts[0].trim());
+    String operator = parts[1].trim();
+    double operand2 = double.parse(parts[2].trim());
+
+    switch (operator) {
+      case '+':
+        return operand1 + operand2;
+      case '-':
+        return operand1 - operand2;
+      case '*':
+        return operand1 * operand2;
+      case '/':
+        if (operand2 == 0) throw Exception('Cannot divide by zero');
+        return operand1 / operand2;
+      default:
+        throw Exception('Invalid operator');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,16 +128,15 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     );
   }
 
-  // Helper function to build calculator buttons
   Widget _buildButton(String label) {
     return InkWell(
       onTap: () {
         if (label == 'C') {
-          //Clear Display
+          clearDisplay();
         } else if (label == '=') {
-          //Calculate Result
+          calculateResult();
         } else {
-          //Update Display
+          updateDisplay(label);
         }
       },
       child: Container(
