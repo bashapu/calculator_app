@@ -24,12 +24,15 @@ class CalculatorHomePage extends StatefulWidget {
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String displayText = '';
 
-  // Function to update the display text
   void updateDisplay(String value) {
-    setState(() {
-      displayText += value;
-    });
+  if (value == '.' && displayText.contains('.')) {
+    return;
   }
+  setState(() {
+    displayText += value;
+  });
+}
+
 
   void calculateResult() {
     try {
